@@ -1,0 +1,41 @@
+version: "2"
+
+services:
+  nginx:
+    build: nginx/
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+
+  php:
+    build: php/
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+
+  cron:
+    build: php/
+    user: root
+    command: /usr/local/bin/cronstart
+    tty: true
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: magento
+      MYSQL_DATABASE: magento
+      MYSQL_USER: magento
+      MYSQL_PASSWORD: magento
+
+volumes:
+  db-data:
